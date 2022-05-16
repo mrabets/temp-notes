@@ -6,24 +6,28 @@ import (
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Привет из Snippetbox"))
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
+
+	w.Write([]byte("Hello World"))
 }
 
-func showSnippet(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Отображение заметки..."))
+func showNote(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Current note"))
 }
 
-func createSnippet(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Форма для создания новой заметки..."))
+func createNote(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Create new note"))
 }
 
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", home)
-	mux.HandleFunc("/snippet", showSnippet)
-	mux.HandleFunc("/snippet/create", createSnippet)
+	mux.HandleFunc("/note", showNote)
+	mux.HandleFunc("/note/create", createNote)
 
-	log.Println("Запуск веб-сервера на http://127.0.0.1:4000")
-	err := http.ListenAndServe(":4000", mux)
-	log.Fatal(err)
+	log.Println("Server is running on http://127.0.0.1:9090")
+	log.Fatal(http.ListenAndServe(":9090", mux))
 }
