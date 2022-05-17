@@ -1,8 +1,9 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"net/http"
+	"strconv"
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
@@ -15,7 +16,13 @@ func home(w http.ResponseWriter, r *http.Request) {
 }
 
 func showNote(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Current note"))
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil || id < 1 {
+		http.NotFound(w, r)
+		return
+	}
+
+	fmt.Fprintf(w, "The note with ID %d", id)
 }
 
 func createNote(w http.ResponseWriter, r *http.Request) {
@@ -28,14 +35,4 @@ func createNote(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	w.Write([]byte(`{ title: "Lorem ipsum" }`))
-}
-
-func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", home)
-	mux.HandleFunc("/note", showNote)
-	mux.HandleFunc("/note/create", createNote)
-
-	log.Println("Server is running on http://127.0.0.1:9090")
-	log.Fatal(http.ListenAndServe(":9090", mux))
 }
